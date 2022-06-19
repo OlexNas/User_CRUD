@@ -1,6 +1,6 @@
 service: user-auth
 app: user-auth
-org: alexnas
+org: 'yourOrgName'
 
 
 frameworkVersion: '3'
