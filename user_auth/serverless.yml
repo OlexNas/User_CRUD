@@ -1,0 +1,66 @@
+service: user-auth
+app: user-auth
+org: alexnas
+
+
+frameworkVersion: '3'
+
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev-user-auth
+  region: us-east-2
+
+
+plugins:
+  - serverless-iam-roles-per-function
+
+
+functions:
+  register:
+    handler: handler.crud_lambda
+    events:
+      - httpApi:
+          path: /users
+          method: get
+      - httpApi:
+          path: /user
+          method: get
+      - httpApi:
+          path: /user
+          method: post
+      - httpApi:
+          path: /user
+          method: patch
+      - httpApi:
+          path: /user
+          method: delete
+
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+          - dynamodb:Get*
+          - dynamodb:Scan*
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/user_crud_1
+
+
+resources:
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: user_crud_1
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
